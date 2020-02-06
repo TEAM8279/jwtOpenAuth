@@ -4,14 +4,25 @@
 namespace App\Object;
 
 
+use App\Config\Configuration;
 use Otp\GoogleAuthenticator;
 use Otp\Otp;
 use ParagonIE\ConstantTime\Encoding;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+/**
+ * Class User contains the action for the user
+ * @package App\Object
+ */
 class User
 {
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function login (Request $request, Response $response, $args) {
         $mail = filter_input(INPUT_POST, 'mail', FILTER_SANITIZE_EMAIL);
         $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
@@ -46,42 +57,48 @@ class User
                         return $response
                             ->withHeader('Content-Type', 'application/json')
                             ->withStatus(200);
-                    }
-                }
+                    } // password verify
+                } // rowcount
                 $data = json_encode(array(
                     "error" => [
-                        "code" => "400",
+                        "code" => "401",
                         "message" => "wrong email or password"
                     ]
                 ));
                 $response->getBody()->write($data);
                 return $response
                     ->withHeader('Content-Type', 'application/json')
-                    ->withStatus(400);
-            }
+                    ->withStatus(401);
+            } // validation of the mail
             $data = json_encode(array(
                 "error" => [
-                    "code" => "400",
+                    "code" => "422",
                     "message" => "Bad email format"
                 ]
             ));
             $response->getBody()->write($data);
             return $response
                 ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
-        }
+                ->withStatus(422);
+        } // isset mail and passord
         $data = json_encode(array(
             "error" => [
-                "code" => "400",
-                "message" => "some data are missing"
+                "code" => "412",
+                "message" => "mail or password are missing"
             ]
         ));
         $response->getBody()->write($data);
         return $response
             ->withHeader('Content-Type', 'application/json')
-            ->withStatus(400);
+            ->withStatus(412);
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function register (Request $request, Response $response, $args) {
         $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
         $mail = filter_input(INPUT_POST, 'mail', FILTER_SANITIZE_EMAIL);
@@ -127,41 +144,47 @@ class User
                                 ->withStatus(409);
                         }
                     }
-                }
+                } // email validation
                 $data = json_encode(array(
                     "error" => [
-                        "code" => "400",
+                        "code" => "422",
                         "message" => "Bad email format"
                     ]
                 ));
                 $response->getBody()->write($data);
                 return $response
                     ->withHeader('Content-Type', 'application/json')
-                    ->withStatus(400);
-            }
+                    ->withStatus(422);
+            } // password length
             $data = json_encode(array(
                 "error" => [
-                    "code" => "400",
-                    "message" => "Password to short, 8 character required"
+                    "code" => "422",
+                    "message" => "Password to short, 8 characters required"
                 ]
             ));
             $response->getBody()->write($data);
             return $response
                 ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
-        }
+                ->withStatus(422);
+        } // isset password, mail, name
         $data = json_encode(array(
             "error" => [
-                "code" => "400",
-                "message" => "some data are missing"
+                "code" => "412",
+                "message" => "missing mail, name or password"
             ]
         ));
         $response->getBody()->write($data);
         return $response
             ->withHeader('Content-Type', 'application/json')
-            ->withStatus(400);
+            ->withStatus(412);
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function totp (Request $request, Response $response, $args)
     {
         if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
@@ -171,134 +194,146 @@ class User
                 $data = $tokenVerificator->validateToken($bearer[1]);
                 if ($data) {
                     if (isset($data->mail) && isset($data->id)) {
-                        $secret = GoogleAuthenticator::generateRandom();
-                        $qrCode = GoogleAuthenticator::getQrCodeUrl('totp', "OAuth martitom for $data->mail", $secret);
-                        // update de la base
-                        $query = "UPDATE user SET totp_key = '$secret', totp_key_validate = false WHERE id = :id";
-                        $db = new Database();
-                        $connection = $db->getConnection();
-                        $req = $connection->prepare($query);
-                        $req->bindParam(':id', $data->id);
+                        // check if the user have already a key
+                        if () {
+                            $secret = GoogleAuthenticator::generateRandom();
+                            $qrCode = GoogleAuthenticator::getQrCodeUrl('totp', Configuration::$OAuthApplicationLabel . " $data->mail", $secret);
+                            // update de la base
+                            $query = "UPDATE user SET totp_key = '$secret', totp_key_validate = false WHERE id = :id";
+                            $db = new Database();
+                            $connection = $db->getConnection();
+                            $req = $connection->prepare($query);
+                            $req->bindParam(':id', $data->id);
 
-                        $req->execute();
+                            $req->execute();
 
+                            $data = json_encode(array(
+                                "id" => $data->id,
+                                "mail" => $data->mail,
+                                "token" => $bearer[1],
+                                "qr_url" => $qrCode
+                            ));
+                            $response->getBody()->write($data);
+                            return $response
+                                ->withHeader('Content-Type', 'application/json')
+                                ->withStatus(200);
+
+                        } // user have already key
                         $data = json_encode(array(
-                            "id" => $data->id,
-                            "mail" => $data->mail,
-                            "token" => $bearer[1],
-                            "qr_url" => $qrCode
+                            "error" => [
+                                "code" => 409,
+                                "message" => "the key have already been set"
+                            ]
                         ));
                         $response->getBody()->write($data);
                         return $response
                             ->withHeader('Content-Type', 'application/json')
-                            ->withStatus(200);
+                            ->withStatus(409);
                     }
                 }
                 $data = json_encode(array(
                     "error" => [
-                        "code" => 400,
+                        "code" => 403,
                         "message" => "invalid token"
                     ]
                 ));
                 $response->getBody()->write($data);
                 return $response
                     ->withHeader('Content-Type', 'application/json')
-                    ->withStatus(400);
+                    ->withStatus(403);
             }
         }
         $data = json_encode(array(
             "error" => [
-                "code" => 400,
-                "message" => "some data are missing"
+                "code" => 412,
+                "message" => "bearer token not set"
             ]
         ));
         $response->getBody()->write($data);
         return $response
             ->withHeader('Content-Type', 'application/json')
-            ->withStatus(400);
+            ->withStatus(412);
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function totpV (Request $request, Response $response, $args) {
-        $bearer = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
-        $key = $_POST['key'];
-        if ($bearer[0] == 'Bearer') {
-            $tokenVerificator = new Token();
-            $data =  $tokenVerificator->validateToken($bearer[1]);
-            if ($data) {
-                if (isset($data->mail) && isset($data->id)) {
-                    $query = "SELECT totp_key, name, totp_key_validate FROM user WHERE id = :id AND totp_key IS NOT null";
-                    $db = new Database();
-                    $connection = $db->getConnection();
-                    $req = $connection->prepare($query);
-                    $req->bindParam(':id', $data->id);
-                    $req->execute();
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $bearer = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
 
-                    if ($req->rowCount() > 0) {
-                        $row = $req->fetch();
-                        if ($row['totp_key_validate'] == 0) {
-                            $secret = $row['totp_key']; // get the secret in the base
 
-                            $otp = new Otp();
-                            if ($otp->checkTotp(Encoding::base32DecodeUpper($secret), $key)) {
-                                // validate the secret and resend a good token
-                                $query = "UPDATE user SET totp_key_validate = true WHERE id = :id";
-                                $db = new Database();
-                                $connection = $db->getConnection();
-                                $req = $connection->prepare($query);
-                                $req->bindParam(':id', $data->id);
-                                $req->execute();
+            if (isset($_POST['key'])) {
+                $key = $_POST['key'];
 
-                                $token = $tokenVerificator->generate($data->id, $data->mail, $row['name']);
 
-                                $data = json_encode(array(
-                                    "id" => $data->id,
-                                    "mail" => $data->mail,
-                                    "token" => $token,
-                                ));
-                                $response->getBody()->write($data);
-                                return $response
-                                    ->withHeader('Content-Type', 'application/json')
-                                    ->withStatus(200);
+                if ($bearer[0] == 'Bearer') {
+                    $tokenVerificator = new Token();
+                    $data =  $tokenVerificator->validateToken($bearer[1]);
+
+
+                    if ($data) {
+
+
+                        if (isset($data->mail) && isset($data->id)) {
+                            $query = "SELECT totp_key, name, totp_key_validate FROM user WHERE id = :id AND totp_key IS NOT null";
+                            $db = new Database();
+                            $connection = $db->getConnection();
+                            $req = $connection->prepare($query);
+                            $req->bindParam(':id', $data->id);
+                            $req->execute();
+
+
+                            if ($req->rowCount() > 0) {
+                                $row = $req->fetch();
+
+
+                                if ($row['totp_key_validate'] == 0) {
+                                    $secret = $row['totp_key']; // get the secret in the base
+
+                                    $otp = new Otp();
+
+
+                                    if ($otp->checkTotp(Encoding::base32DecodeUpper($secret), $key)) {
+                                        // validate the secret and resend a good token
+                                        $query = "UPDATE user SET totp_key_validate = true WHERE id = :id";
+                                        $db = new Database();
+                                        $connection = $db->getConnection();
+                                        $req = $connection->prepare($query);
+                                        $req->bindParam(':id', $data->id);
+                                        $req->execute();
+
+                                        $token = $tokenVerificator->generate($data->id, $data->mail, $row['name']);
+
+                                        $data = json_encode(array(
+                                            "id" => $data->id,
+                                            "mail" => $data->mail,
+                                            "token" => $token,
+                                            "full-login" => true
+                                        ));
+                                        $response->getBody()->write($data);
+                                        return $response
+                                            ->withHeader('Content-Type', 'application/json')
+                                            ->withStatus(200);
+                                    }
+                                }
                             }
-                            // receive a alert message when the user have already validate the secret
-                            $data = json_encode(array(
-                                "error" => [
-                                    "code" => 400,
-                                    "message" => "wrong key"
-                                ]
-                            ));
-                            $response->getBody()->write($data);
-                            return $response
-                                ->withHeader('Content-Type', 'application/json')
-                                ->withStatus(400);
                         }
-                        $data = json_encode(array(
-                            "error" => [
-                                "code" => 400,
-                                "message" => "data key already validate"
-                            ]
-                        ));
-                        $response->getBody()->write($data);
-                        return $response
-                            ->withHeader('Content-Type', 'application/json')
-                            ->withStatus(400);
                     }
-                    $data = json_encode(array(
-                        "error" => [
-                            "code" => 400,
-                            "message" => "no key params"
-                        ]
-                    ));
-                    $response->getBody()->write($data);
-                    return $response
-                        ->withHeader('Content-Type', 'application/json')
-                        ->withStatus(400);
                 }
             }
         }
     }
 
-    // create a function dblAuthenticate key
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function loginValidation (Request $request, Response $response, $args) {
         $bearer = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
         $key = $_POST['key'];
@@ -377,5 +412,15 @@ class User
                 }
             }
         }
+        $data = json_encode(array(
+            "error" => [
+                "code" => 400,
+                "message" => "invalide token"
+            ]
+        ));
+        $response->getBody()->write($data);
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(400);
     }
 }

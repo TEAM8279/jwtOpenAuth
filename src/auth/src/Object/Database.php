@@ -4,6 +4,7 @@
 namespace App\Object;
 
 
+use App\Config\Configuration;
 use PDO;
 use PDOException;
 
@@ -22,11 +23,10 @@ class Database
 
     public function __construct()
     {
-        $dbinc = new DatabaseInc();
-        $this->dbName = $dbinc->getDbName();
-        $this->host = $dbinc->getHost();
-        $this->user = $dbinc->getUser();
-        $this->password = $dbinc->getPassword();
+        $this->dbName = Configuration::$dbName;
+        $this->host = Configuration::$dbhost;
+        $this->user = Configuration::$dbuser;
+        $this->password = Configuration::$dbpassword;
     }
 
     /**
