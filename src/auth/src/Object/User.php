@@ -533,6 +533,56 @@ class User
     }
 
     public function tokenValidation (Request $request, Response $response, $args) {
-
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $bearer = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
+            if ($bearer[0] == 'Bearer') {
+                $tokenVerificator = new Token();
+                $data = $tokenVerificator->validateToken($bearer[1]);
+                if ($data) {
+                    $json = json_encode([
+                        "id" => $data->id,
+                        "mail" => $data->mail,
+                        "full-login" => $data->fullLogin,
+                        "iss" => $data->iss,
+                        "iat" => $data->iat,
+                        "token" => $bearer[1]
+                    ]);
+                    $response->getBody()->write($json);
+                    return $response
+                        ->withHeader('Content-Type', 'application/json')
+                        ->withStatus(200);
+                }
+                $json = json_encode([
+                    "error" => [
+                        "code" => 403,
+                        "message" => "the token is invalid"
+                    ]
+                ]);
+                $response->getBody()->write($json);
+                return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(403);
+            }
+            $json = json_encode([
+                "error" => [
+                    "code" => 412,
+                    "message" => "This is not a bearer"
+                ]
+            ]);
+            $response->getBody()->write($json);
+            return $response
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(412);
+        }
+        $json = json_encode([
+            "error" => [
+                "code" => 412,
+                "message" => "You dont have any token"
+            ]
+        ]);
+        $response->getBody()->write($json);
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(412);
     }
 }

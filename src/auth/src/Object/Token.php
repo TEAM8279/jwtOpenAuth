@@ -37,7 +37,7 @@ class Token
         $payload = array(
             "id" => $userId,
             "mail" => $usermail,
-            "full-login" => false,
+            "fullLogin" => false,
             "iss" => Configuration::$tokenIss,
             "iat" => $_SERVER['REQUEST_TIME']
         );
@@ -70,7 +70,7 @@ class Token
             "id" => $id,
             "mail" => $mail,
             "name" => $name,
-            "full-login" => true,
+            "fullLogin" => true,
             "iss" => Configuration::$tokenIss,
             "iat" => $_SERVER['REQUEST_TIME']
         );
