@@ -13,4 +13,5 @@ return function (App $app) {
     $app->post('/register', User::class . ':register');
     $app->post('/totp', User::class . ':totp');
     $app->post('/totp/validation', User::class . ':totpV');
+    $app->post('/token/check', User::class . ':tokenValidation');
 };

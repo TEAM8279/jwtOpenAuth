@@ -37,7 +37,9 @@ class Token
         $payload = array(
             "id" => $userId,
             "mail" => $usermail,
-            "full-login" => false
+            "full-login" => false,
+            "iss" => Configuration::$tokenIss,
+            "iat" => $_SERVER['REQUEST_TIME']
         );
         return JWT::encode($payload, $this->key);
     }
@@ -68,7 +70,9 @@ class Token
             "id" => $id,
             "mail" => $mail,
             "name" => $name,
-            "full-login" => true
+            "full-login" => true,
+            "iss" => Configuration::$tokenIss,
+            "iat" => $_SERVER['REQUEST_TIME']
         );
         return JWT::encode($payload, $this->key);
     }

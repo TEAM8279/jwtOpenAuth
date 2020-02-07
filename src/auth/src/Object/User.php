@@ -124,7 +124,7 @@ class User
                         $req->execute();
                         $data = json_encode(array(
                             "name" => $name,
-                            "mail" => $mail
+                            "mail" => $mail,
                         ));
                         $response->getBody()->write($data);
                         return $response
@@ -217,7 +217,8 @@ class User
                                 "id" => $data->id,
                                 "mail" => $data->mail,
                                 "token" => $bearer[1],
-                                "qr_url" => $qrCode
+                                "qr_url" => $qrCode,
+                                "secret" => $secret
                             ));
                             $response->getBody()->write($data);
                             return $response
@@ -351,37 +352,37 @@ class User
                                     }
                                     $data = json_encode(array(
                                         "error" => [
-                                            "code" => 412,
+                                            "code" => 401,
                                             "message" => "wrong key"
                                         ]
                                     ));
                                     $response->getBody()->write($data);
                                     return $response
                                         ->withHeader('Content-Type', 'application/json')
-                                        ->withStatus(412);
+                                        ->withStatus(401);
                                 }
                                 $data = json_encode(array(
                                     "error" => [
-                                        "code" => 412,
+                                        "code" => 422,
                                         "message" => "you ALREADY have validate your secret"
                                     ]
                                 ));
                                 $response->getBody()->write($data);
                                 return $response
                                     ->withHeader('Content-Type', 'application/json')
-                                    ->withStatus(412);
+                                    ->withStatus(422);
                             }
                             $data = json_encode(array(
                                 "error" => [
-                                    "code" => 412,
-                                    "message" => "you don't have set the secret, please use the code setting url",
+                                    "code" => 401,
+                                    "message" => "you don't have set the secret, please use the url for set your secret",
                                     "url" => "/totp"
                                 ]
                             ));
                             $response->getBody()->write($data);
                             return $response
                                 ->withHeader('Content-Type', 'application/json')
-                                ->withStatus(412);
+                                ->withStatus(401);
                         }
                     }
                 }
@@ -473,29 +474,29 @@ class User
                                     }
                                     $data = json_encode(array(
                                         "error" => [
-                                            "code" => 412,
+                                            "code" => 401,
                                             "message" => "wrong key"
                                         ]
                                     ));
                                     $response->getBody()->write($data);
                                     return $response
                                         ->withHeader('Content-Type', 'application/json')
-                                        ->withStatus(412);
+                                        ->withStatus(401);
                                 }
                                 $data = json_encode(array(
                                     "error" => [
-                                        "code" => 412,
+                                        "code" => 401,
                                         "message" => "you DONT have validate your secret"
                                     ]
                                 ));
                                 $response->getBody()->write($data);
                                 return $response
                                     ->withHeader('Content-Type', 'application/json')
-                                    ->withStatus(412);
+                                    ->withStatus(401);
                             }
                             $data = json_encode(array(
                                 "error" => [
-                                    "code" => 412,
+                                    "code" => 403,
                                     "message" => "you don't have set the secret, please use the code setting url",
                                     "url" => "/totp"
                                 ]
@@ -503,7 +504,7 @@ class User
                             $response->getBody()->write($data);
                             return $response
                                 ->withHeader('Content-Type', 'application/json')
-                                ->withStatus(412);
+                                ->withStatus(403);
                         }
                     }
                 }
@@ -529,5 +530,9 @@ class User
         return $response
             ->withHeader('Content-Type', 'application/json')
             ->withStatus(412);
+    }
+
+    public function tokenValidation (Request $request, Response $response, $args) {
+
     }
 }

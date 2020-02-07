@@ -37,4 +37,8 @@ class Configuration
      * I think 1024 bits is good.
      */
     public static $tokenKey = "Example";
+    /**
+     * @var string contains the token iss
+     */
+    public static $tokenIss = "https://auth.martitom.ch";
 }
