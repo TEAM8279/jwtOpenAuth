@@ -424,14 +424,14 @@ class User
             if ($bearer[0] == 'Bearer') {
                 $tokenVerificator = new Token();
                 $data = $tokenVerificator->validateToken($bearer[1]);
-                if (isset($_POST['key'])) {
-                    $key = $_POST['key'];
+                if ($data) {
 
 
-                    if ($data) {
+                    if (isset($data->mail) && isset($data->id)) {
 
 
-                        if (isset($data->mail) && isset($data->id)) {
+                        if (isset($_POST['key'])) {
+                            $key = $_POST['key'];
                             $query = "SELECT totp_key, name, totp_key_validate FROM user WHERE id = :id AND totp_key IS NOT null";
                             $db = new Database();
                             $connection = $db->getConnection();
@@ -506,18 +506,28 @@ class User
                                 ->withHeader('Content-Type', 'application/json')
                                 ->withStatus(403);
                         }
+                        $data = json_encode(array(
+                            "error" => [
+                                "code" => 412,
+                                "message" => "you missing your key"
+                            ]
+                        ));
+                        $response->getBody()->write($data);
+                        return $response
+                            ->withHeader('Content-Type', 'application/json')
+                            ->withStatus(412);
                     }
                 }
                 $data = json_encode(array(
                     "error" => [
-                        "code" => 412,
-                        "message" => "you missing your key"
+                        "code" => 403,
+                        "message" => "Invalid token"
                     ]
                 ));
                 $response->getBody()->write($data);
                 return $response
                     ->withHeader('Content-Type', 'application/json')
-                    ->withStatus(412);
+                    ->withStatus(403);
             }
         }
         $data = json_encode(array(

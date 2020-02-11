@@ -36,7 +36,7 @@ class Configuration
      * @var string contains the secret key for encryption of the token
      * I think 1024 bits is good.
      */
-    public static $tokenKey = "Example";
+    public static $tokenKey = "example";
     /**
      * @var string contains the token iss
      */
