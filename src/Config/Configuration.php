@@ -12,19 +12,19 @@ class Configuration
     /**
      * @var string contains the name of the database
      */
-    public static $dbName = "auth";
+    public static $dbName = "mydb";
     /**
      * @var string contains the host of the database
      */
-    public static $dbhost = "localhost";
+    public static $dbhost = "myhost";
     /**
      * @var string contains the user of the database
      */
-    public static $dbuser = "admin";
+    public static $dbuser = "myuser";
     /**
      * @var string contains the password of the user of the database
      */
-    public static $dbpassword = "Youpla";
+    public static $dbpassword = "mypassword";
 
     /**
      * @var string contains the start of the label for the dblcheck app
