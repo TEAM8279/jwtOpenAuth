@@ -1,18 +1,18 @@
 {
     "name": "tommarti/jwtopenauth",
-    "description": "Two-factor authentication api that can be implemented very quickly and easily.",
+    "description": "Two-factor authentication api that can be implemented very quickly and easily based on SlimFramework.",
     "keywords": [
         "api",
-        "two-factor",
-        "authentication"
+        "authentication",
+        "two-factor"
     ],
-    "homepage": "https://github.com/TomMarti/jwtOpenAuth",
+    "homepage": "http://github.com/TomMarti/jwtOpenAuth",
     "license": "MIT",
     "authors": [
         {
             "name": "Tom Marti",
             "email": "martitom.ch@gmail.com",
-            "homepage": "https://www.martitom.ch/"
+            "homepage": "https://martitom.ch/"
         }
     ],
     "require": {
@@ -46,5 +46,6 @@
     "scripts": {
         "start": "php -S localhost:8080 -t public",
         "test": "phpunit"
-    }
+    },
+    "prefer-stable": true
 }

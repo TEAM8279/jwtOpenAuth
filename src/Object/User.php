@@ -62,8 +62,7 @@ class User
                 $data = json_encode(array(
                     "error" => [
                         "code" => "401",
-                        "message" => "Try again it's not your credentials",
-                        "name" => "WrongEmailOrPassword"
+                        "message" => "wrong email or password"
                     ]
                 ));
                 $response->getBody()->write($data);
@@ -74,8 +73,7 @@ class User
             $data = json_encode(array(
                 "error" => [
                     "code" => "422",
-                    "message" => "the format of the email isn't [example] @ [exemple.com]",
-                    "name" => "BadEmailFormat"
+                    "message" => "Bad email format"
                 ]
             ));
             $response->getBody()->write($data);
@@ -86,8 +84,7 @@ class User
         $data = json_encode(array(
             "error" => [
                 "code" => "412",
-                "message" => "You don't have put the mail or/and the password in the body",
-                "name" => "MissingMailOrPassword"
+                "message" => "mail or password are missing"
             ]
         ));
         $response->getBody()->write($data);
@@ -138,8 +135,7 @@ class User
                             $data = json_encode(array(
                                 "error" => [
                                     "code" => "409",
-                                    "message" => "This email is already registered",
-                                    "AlreadyRegistered"
+                                    "message" => "This email is already registered"
                                 ]
                             ));
                             $response->getBody()->write($data);
@@ -152,8 +148,7 @@ class User
                 $data = json_encode(array(
                     "error" => [
                         "code" => "422",
-                        "message" => "Bad email format",
-                        "name" => "BadEmailFormat"
+                        "message" => "Bad email format"
                     ]
                 ));
                 $response->getBody()->write($data);
@@ -164,8 +159,7 @@ class User
             $data = json_encode(array(
                 "error" => [
                     "code" => "422",
-                    "message" => "Password to short, 8 characters required",
-                    "name" => "ToShortPassword"
+                    "message" => "Password to short, 8 characters required"
                 ]
             ));
             $response->getBody()->write($data);
@@ -176,8 +170,7 @@ class User
         $data = json_encode(array(
             "error" => [
                 "code" => "412",
-                "message" => "missing mail, name or password",
-                "name" => "MissingSomething"
+                "message" => "missing mail, name or password"
             ]
         ));
         $response->getBody()->write($data);
@@ -482,8 +475,7 @@ class User
                                     $data = json_encode(array(
                                         "error" => [
                                             "code" => 401,
-                                            "message" => "wrong key",
-                                            "name" => "WrongKey"
+                                            "message" => "wrong key"
                                         ]
                                     ));
                                     $response->getBody()->write($data);
@@ -494,8 +486,7 @@ class User
                                 $data = json_encode(array(
                                     "error" => [
                                         "code" => 401,
-                                        "message" => "you DONT have validate your secret",
-                                        "name" => "UnvalidateSecret"
+                                        "message" => "you DONT have validate your secret"
                                     ]
                                 ));
                                 $response->getBody()->write($data);
@@ -507,8 +498,7 @@ class User
                                 "error" => [
                                     "code" => 403,
                                     "message" => "you don't have set the secret, please use the code setting url",
-                                    "url" => "/totp",
-                                    "name" => "UnsetSecret"
+                                    "url" => "/totp"
                                 ]
                             ));
                             $response->getBody()->write($data);
@@ -519,8 +509,7 @@ class User
                         $data = json_encode(array(
                             "error" => [
                                 "code" => 412,
-                                "message" => "Are you missing your key ?",
-                                "name" => "MissingKey"
+                                "message" => "you missing your key"
                             ]
                         ));
                         $response->getBody()->write($data);
@@ -532,8 +521,7 @@ class User
                 $data = json_encode(array(
                     "error" => [
                         "code" => 403,
-                        "message" => "You Shall Not Pass ! with this invalid token",
-                        "name" => "InvalidToken"
+                        "message" => "Invalid token"
                     ]
                 ));
                 $response->getBody()->write($data);
@@ -545,8 +533,7 @@ class User
         $data = json_encode(array(
             "error" => [
                 "code" => 412,
-                "message" => "the authentication file is empty",
-                "name" => "BearerNotSet"
+                "message" => "bearer token not set"
             ]
         ));
         $response->getBody()->write($data);
