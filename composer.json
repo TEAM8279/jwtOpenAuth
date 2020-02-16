@@ -19,7 +19,6 @@
         "php": ">=7.1",
         "ext-json": "*",
         "ext-pdo": "*",
-        "bacon/bacon-qr-code": "^1.0.3",
         "christian-riesen/otp": "^2.6",
         "firebase/php-jwt": "^5.0",
         "monolog/monolog": "^1.24",
