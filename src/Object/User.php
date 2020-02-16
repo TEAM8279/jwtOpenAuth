@@ -107,7 +107,7 @@ class User
         if (isset($name) && isset($mail) && isset($password)) {
             if (strlen($password) >= 8) {
                 if (filter_var($mail, FILTER_VALIDATE_EMAIL)) {
-                    $query = "INSERT INTO `user`(`name`, `mail`, `password`, `created_at`, `update_at`) VALUES (:name, :mail, :password, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+                    $query = "INSERT INTO `user`(`name`, `mail`, `password`) VALUES (:name, :mail, :password)";
 
                     $db = new Database();
 
