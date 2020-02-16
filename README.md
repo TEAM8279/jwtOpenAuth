@@ -1,2 +1,3 @@
-# jwtauth
-A structure for authenticating people
+# jwtOpenAuth
+JwtOpenAuth is a two-factor authentication api that can be implemented very quickly and easily.
+## Get Started
