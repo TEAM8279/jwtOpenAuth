@@ -1,5 +1,5 @@
 {
-    "name": "TomMarti/jwtopenauth",
+    "name": "tommarti/jwtopenauth",
     "description": "Two-factor authentication api that can be implemented very quickly and easily.",
     "keywords": [
         "api",
