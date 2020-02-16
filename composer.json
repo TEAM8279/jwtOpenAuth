@@ -1,31 +1,24 @@
 {
-    "name": "slim/slim-skeleton",
-    "description": "A Slim Framework skeleton application for rapid development",
+    "name": "tommarti/jwtopenauth",
+    "description": "Two-factor authentication api that can be implemented very quickly and easily.",
     "keywords": [
-        "microframework",
-        "rest",
-        "router",
-        "psr7"
+        "api",
+        "two-factor",
+        "authentication"
     ],
-    "homepage": "http://github.com/slimphp/Slim-Skeleton",
+    "homepage": "https://github.com/TomMarti/jwtOpenAuth",
     "license": "MIT",
     "authors": [
         {
-            "name": "Josh Lockhart",
-            "email": "info@joshlockhart.com",
-            "homepage": "http://www.joshlockhart.com/"
-        },
-        {
-            "name": "Pierre Berube",
-            "email": "pierre@lgse.com",
-            "homepage": "http://www.lgse.com/"
+            "name": "Tom Marti",
+            "email": "martitom.ch@gmail.com",
+            "homepage": "https://www.martitom.ch/"
         }
     ],
     "require": {
         "php": ">=7.1",
         "ext-json": "*",
         "ext-pdo": "*",
-        "bacon/bacon-qr-code": "^1.0.3",
         "christian-riesen/otp": "^2.6",
         "firebase/php-jwt": "^5.0",
         "monolog/monolog": "^1.24",
@@ -42,7 +35,7 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/",
+            "App\\": "src/"
         }
     },
     "autoload-dev": {
