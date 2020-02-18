@@ -12,20 +12,52 @@ class Configuration
     /**
      * @var string contains the name of the database
      */
-    public static $dbName = "mydb";
+    public static $dbName = "auth";
     /**
      * @var string contains the host of the database
      */
-    public static $dbhost = "myhost";
+    public static $dbhost = "localhost";
     /**
      * @var string contains the user of the database
      */
-    public static $dbuser = "myuser";
+    public static $dbuser = "admin";
     /**
      * @var string contains the password of the user of the database
      */
-    public static $dbpassword = "mypassword";
+    public static $dbpassword = "Youpla";
 
+    /**
+     * @var string name of the user table in the database
+     */
+    public static $dbTbUserName = "user";
+
+    /**
+     * @var string name of the id column in the user table
+     */
+    public static $dbTbUserClIdName = "id";
+    /**
+     * @var string name of the name column in the user table
+     */
+    public static $dbTbUserClNameName = "name";
+    /**
+     * @var string name of the mail column in the user table
+     */
+    public static $dbTbUserClMailName = "mail";
+    /**
+     * @var string name of the password column in the user table
+     */
+    public static $dbTbUserClPasswordName = "password";
+    /**
+     * @var string name of the totp_key column in the user table
+     */
+    public static $dbTbUserClTotpKeyName = "totp_key";
+    /**
+     * @var string name of the totp key validate column in the user table
+     */
+    public static $dbTbUserClTotpKeyValidateName = "totp_key_validate";
+
+
+    
     /**
      * @var string contains the start of the label for the dblcheck app
      * Example: [start] + [usermail] = Oauth martitom for tom@martitom.ch

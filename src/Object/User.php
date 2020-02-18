@@ -29,7 +29,7 @@ class User
 
         if (isset($mail) && isset($password)) {
             if (filter_var($mail, FILTER_VALIDATE_EMAIL)) {
-                $query = "SELECT id, name, mail, password, totp_key FROM user WHERE mail = :mail";
+                $query = "SELECT ". Configuration::$dbTbUserClIdName .", ". Configuration::$dbTbUserClNameName .", ". Configuration::$dbTbUserClMailName .", ". Configuration::$dbTbUserClPasswordName . ", ". Configuration::$dbTbUserClTotpKeyName ." FROM ". Configuration::$dbTbUserName ." WHERE ". Configuration::$dbTbUserClMailName ." = :mail";
                 $db = new Database();
                 $connection = $db->getConnection();
                 $req = $connection->prepare($query);
@@ -39,10 +39,10 @@ class User
 
                 if ($req->rowCount() > 0) {
                     $data = $req->fetch();
-                    $dbid = $data['id'];
-                    $dbName = $data['name'];
-                    $dbmail = $data['mail'];
-                    $dbpassword = $data['password'];
+                    $dbid = $data[Configuration::$dbTbUserClIdName];
+                    $dbName = $data[Configuration::$dbTbUserClNameName];
+                    $dbmail = $data[Configuration::$dbTbUserClMailName];
+                    $dbpassword = $data[Configuration::$dbTbUserClPasswordName];
                     if (password_verify($password, $dbpassword)) {
                         $tokenFactory = new Token();
                         $token = $tokenFactory->generateTemporaryToken($dbmail, $dbid);
@@ -51,7 +51,7 @@ class User
                             "name" => $dbName,
                             "mail" => $dbmail,
                             "token" => $token,
-                            "double-check" => $data['totp_key'] !== null
+                            "double-check" => $data[Configuration::$dbTbUserClTotpKeyName] !== null
                         ));
                         $response->getBody()->write($data);
                         return $response
@@ -107,8 +107,8 @@ class User
         if (isset($name) && isset($mail) && isset($password)) {
             if (strlen($password) >= 8) {
                 if (filter_var($mail, FILTER_VALIDATE_EMAIL)) {
-                    $query = "INSERT INTO `user`(`name`, `mail`, `password`) VALUES (:name, :mail, :password)";
-
+                    $query = "INSERT INTO ". Configuration::$dbTbUserName ." (" . Configuration::$dbTbUserClNameName .", ". Configuration::$dbTbUserClMailName .", ". Configuration::$dbTbUserClPasswordName . ") VALUES (:name, :mail, :password)";
+                    echo $query;
                     $db = new Database();
 
                     $connection = $db->getConnection();
@@ -195,7 +195,7 @@ class User
                 if ($data) {
                     if (isset($data->mail) && isset($data->id)) {
                         // check if the user have already a key
-                        $query = "SELECT totp_key, name, totp_key_validate FROM user WHERE id = :id AND totp_key IS NOT null";
+                        $query = "SELECT ". Configuration::$dbTbUserClTotpKeyName .", ". Configuration::$dbTbUserClIdName .", ". Configuration::$dbTbUserClTotpKeyValidateName ." FROM ". Configuration::$dbTbUserName ." WHERE ". Configuration::$dbTbUserClIdName ." = :id AND ". Configuration::$dbTbUserClTotpKeyName ." IS NOT null";
                         $db = new Database();
                         $connection = $db->getConnection();
                         $req = $connection->prepare($query);
@@ -205,7 +205,7 @@ class User
                             $secret = GoogleAuthenticator::generateRandom();
                             $qrCode = GoogleAuthenticator::getQrCodeUrl('totp', Configuration::$OAuthApplicationLabel . " $data->mail", $secret);
                             // update de la base
-                            $query = "UPDATE user SET totp_key = '$secret', totp_key_validate = false WHERE id = :id";
+                            $query = "UPDATE ". Configuration::$dbTbUserName ." SET ". Configuration::$dbTbUserClTotpKeyName ." = '$secret', ". Configuration::$dbTbUserClTotpKeyValidateName ." = false WHERE ". Configuration::$dbTbUserClIdName ." = :id";
                             $db = new Database();
                             $connection = $db->getConnection();
                             $req = $connection->prepare($query);
@@ -227,11 +227,11 @@ class User
 
                         } // user have already key
                         $row = $req->fetch();
-                        if ($row['totp_key_validate'] == 0) {
+                        if ($row[Configuration::$dbTbUserClTotpKeyValidateName] == 0) {
                             $secret = GoogleAuthenticator::generateRandom();
                             $qrCode = GoogleAuthenticator::getQrCodeUrl('totp', Configuration::$OAuthApplicationLabel . " $data->mail", $secret);
                             // update de la base
-                            $query = "UPDATE user SET totp_key = '$secret', totp_key_validate = false WHERE id = :id";
+                            $query = "UPDATE ". Configuration::$dbTbUserName ." SET ". Configuration::$dbTbUserClTotpKeyName ." = '$secret', ". Configuration::$dbTbUserClTotpKeyValidateName ." = false WHERE ". Configuration::$dbTbUserClIdName ." = :id";
                             $db = new Database();
                             $connection = $db->getConnection();
                             $req = $connection->prepare($query);
@@ -310,7 +310,7 @@ class User
 
 
                         if (isset($data->mail) && isset($data->id)) {
-                            $query = "SELECT totp_key, name, totp_key_validate FROM user WHERE id = :id AND totp_key IS NOT null";
+                            $query = "SELECT ". Configuration::$dbTbUserClTotpKeyName .", ". Configuration::$dbTbUserClNameName ." , ". Configuration::$dbTbUserClTotpKeyValidateName ." FROM ". Configuration::$dbTbUserName ." WHERE ". Configuration::$dbTbUserClIdName ." = :id AND ". Configuration::$dbTbUserClTotpKeyName ." IS NOT null";
                             $db = new Database();
                             $connection = $db->getConnection();
                             $req = $connection->prepare($query);
@@ -322,22 +322,22 @@ class User
                                 $row = $req->fetch();
 
 
-                                if ($row['totp_key_validate'] == 0) {
-                                    $secret = $row['totp_key']; // get the secret in the base
+                                if ($row[Configuration::$dbTbUserClTotpKeyValidateName] == 0) {
+                                    $secret = $row[Configuration::$dbTbUserClTotpKeyName]; // get the secret in the base
 
                                     $otp = new Otp();
 
 
                                     if ($otp->checkTotp(Encoding::base32DecodeUpper($secret), $key)) {
                                         // validate the secret and resend a good token
-                                        $query = "UPDATE user SET totp_key_validate = true WHERE id = :id";
+                                        $query = "UPDATE ". Configuration::$dbTbUserName ." SET ". Configuration::$dbTbUserClTotpKeyValidateName ." = true WHERE ". Configuration::$dbTbUserClIdName ." = :id";
                                         $db = new Database();
                                         $connection = $db->getConnection();
                                         $req = $connection->prepare($query);
                                         $req->bindParam(':id', $data->id);
                                         $req->execute();
 
-                                        $token = $tokenVerificator->generate($data->id, $data->mail, $row['name']);
+                                        $token = $tokenVerificator->generate($data->id, $data->mail, $row[Configuration::$dbTbUserClNameName]);
 
                                         $data = json_encode(array(
                                             "id" => $data->id,
@@ -432,7 +432,7 @@ class User
 
                         if (isset($_POST['key'])) {
                             $key = $_POST['key'];
-                            $query = "SELECT totp_key, name, totp_key_validate FROM user WHERE id = :id AND totp_key IS NOT null";
+                            $query = "SELECT ". Configuration::$dbTbUserClTotpKeyName .", ". Configuration::$dbTbUserClNameName .", ". Configuration::$dbTbUserClTotpKeyValidateName ." FROM ". Configuration::$dbTbUserName ." WHERE ". Configuration::$dbTbUserClIdName ." = :id AND ". Configuration::$dbTbUserClTotpKeyName ." IS NOT null";
                             $db = new Database();
                             $connection = $db->getConnection();
                             $req = $connection->prepare($query);
@@ -444,22 +444,22 @@ class User
                                 $row = $req->fetch();
 
 
-                                if ($row['totp_key_validate'] == 1) {
-                                    $secret = $row['totp_key']; // get the secret in the base
+                                if ($row[Configuration::$dbTbUserClTotpKeyValidateName] == 1) {
+                                    $secret = $row[Configuration::$dbTbUserClTotpKeyName]; // get the secret in the base
 
                                     $otp = new Otp();
 
 
                                     if ($otp->checkTotp(Encoding::base32DecodeUpper($secret), $key)) {
                                         // validate the secret and resend a good token
-                                        $query = "UPDATE user SET totp_key_validate = true WHERE id = :id";
+                                        $query = "UPDATE ". Configuration::$dbTbUserName ." SET ". Configuration::$dbTbUserClTotpKeyValidateName. " = true WHERE ". Configuration::$dbTbUserClIdName ." = :id";
                                         $db = new Database();
                                         $connection = $db->getConnection();
                                         $req = $connection->prepare($query);
                                         $req->bindParam(':id', $data->id);
                                         $req->execute();
 
-                                        $token = $tokenVerificator->generate($data->id, $data->mail, $row['name']);
+                                        $token = $tokenVerificator->generate($data->id, $data->mail, $row[Configuration::$dbTbUserClNameName]);
 
                                         $data = json_encode(array(
                                             "id" => $data->id,

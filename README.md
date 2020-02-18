@@ -35,3 +35,28 @@ To run your application's tests, run this command:
 ``````
 composer test
 ``````
+
+## Configuration
+
+Go in src/Config/Configuration.php in the project and configure your application for working with your infrastructure.
+
+1. Configure the database info
+   * db name
+   * db host
+   * db user
+   * db password
+   * db user table name
+   * db id column name
+   * db name column name
+   * db mail column name
+   * db password column name
+   * db totp_key column name
+   * db totp_key_validate column name
+2. Configure the application label
+3. Configure the token info
+   * token key
+   * token iss
+
+## Generate the api documentation
+
+In progress...
